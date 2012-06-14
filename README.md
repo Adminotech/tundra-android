@@ -22,8 +22,9 @@ The following are the tools that have been tested/used while developing the scri
 * Git
 * Svn
 * Mercurial/Hg
+* Curl
 
-Ubuntu users can run this to get most `sudo apt-get install cmake cmake-data git subversion mercurial`
+Ubuntu users can run this to get most `sudo apt-get install cmake cmake-data git subversion mercurial curl`
 
 Details
 -------
