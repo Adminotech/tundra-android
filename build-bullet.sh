@@ -19,6 +19,6 @@ ${CMAKE_ANDROID} -DBUILD_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -DI
 make -j4
 make install
 
-echo
 popd
+echo
 

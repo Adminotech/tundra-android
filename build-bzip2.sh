@@ -62,6 +62,6 @@ export CXXFLAGS="-Os -D_FILE_OFFSET_BITS=64 -pipe -isysroot ${SYSROOT} -I${ROOTD
 make CC="${CC}" AR="${AR}" RANLIB="${RANLIB}" CFLAGS="${CFLAGS}"
 make install PREFIX=${PREFIX}  # Ignore errors due to share libraries missing
 
-echo
 popd
+echo
 

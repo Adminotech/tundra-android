@@ -51,10 +51,10 @@ export BZIP2_VERSION="1.0.6"
 export BOOST_VERSION="1.49.0"
 
 # Toolchain defines
-ANDROID_API_LEVEL="14"
-ARM_TARGET="armv7"
-TOOLCHAIN_VERSION="4.4.3"
-PLATFORM="arm-linux-androideabi"
+export ANDROID_API_LEVEL="14"
+export ARM_TARGET="armv7"
+export TOOLCHAIN_VERSION="4.4.3"
+export PLATFORM="arm-linux-androideabi"
 
 # Create dist folder
 BUILDDIR=$(pwd)
@@ -83,7 +83,6 @@ echo
 
 export ARCH=${ARM_TARGET}
 export ROOTDIR=${SRCDIR}
-export PLATFORM=${PLATFORM}
 export DROIDTOOLS=${TOOLCHAIN_DIR}/bin/${PLATFORM}
 export SYSROOT=${TOOLCHAIN_DIR}/sysroot
 
@@ -99,6 +98,7 @@ echo "-- CMake toolchain : $PREFAB/android.toolchain.cmake"
 echo
 
 pushd $SRCDIR
+echo
 
 ${TOPDIR}/build-bzip2.sh
 
@@ -108,10 +108,16 @@ ${TOPDIR}/build-ogre.sh
 
 ${TOPDIR}/build-bullet.sh
 
+${TOPDIR}/build-qt.sh
+
+${TOPDIR}/build-knet.sh
+
+${TOPDIR}/build-tundra.sh
+
+popd
+
 echo
 echo "Android build completed"
 echo "-- Results can be found from ${PREFIX}"
 echo
-
-popd
 

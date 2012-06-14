@@ -156,5 +156,6 @@ fi
 
 ./b2 link=static threading=multi target-os=linux toolset=android-arm --layout=unversioned --without-python --without-mpi --without-locale --disable-filesystem3 define=BOOST_FILESYSTEM_VERSION=2 -d+2 install
 
-echo
 popd
+echo
+

@@ -35,6 +35,6 @@ ${CMAKE_ANDROID} -DOGRE_STATIC=TRUE -DOGRE_DEPENDENCIES_DIR=${PREBUILT} \
 make -j4
 make install
 
-echo
 popd
+echo
 
