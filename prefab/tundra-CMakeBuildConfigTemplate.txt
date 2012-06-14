@@ -1,0 +1,170 @@
+## The CMakeBuildConfigTemplate.txt defines the default build settings
+## that are used when you build a clean checkout.
+##
+## CMakeBuildConfigTemplate.txt is only a template file! Changes to that file
+## do not have any effect on the actual CMake execution.
+##
+## For the actual configuration, the file CMakeBuildConfigTemplate.txt gets 
+## copied to CMakeBuildConfig.txt, in which you can customize your own settings.
+##
+## The CMakeBuildConfig.txt is not part of the repository, and do not add it there!
+## The idea is that everyone can customize the set of modules to build using that 
+## file, without having to fear about an accidental commit of these changes.
+
+###### BUILD CONFIGURATION DEFINES ######
+
+## Various flags/defines that configure your build
+
+set (BUILD_SDK_ONLY 0)              # Configure if you want to build only the SDK, meaning projects from src/Application will be omitted
+set (BUILDING_INSTALLER 0)          # Enables additional resources to create icon for the main executable.
+set (ENABLE_BUILD_OPTIMIZATIONS 0)  # Only for Windows: Enables optimizations for compiler and linker. Do not enable this if you are planning to distribute your .lib files! Warning: Increases build time significantly.
+if (NOT APPLE)
+   set (ENABLE_HYDRAX 1)               # Configure the use of Hydrax, http://www.ogre3d.org/tikiwiki/Hydrax
+else() # TODO Apple build script does not build with Hydrax.
+   set (ENABLE_HYDRAX 0)
+endif()
+if (APPLE) # TODO: Apple build script does not work with SkyX at the moment. See https://github.com/realXtend/naali/issues/320 
+   set (ENABLE_SKYX 0)              # Configure the use of SkyX, http://www.ogre3d.org/tikiwiki/SkyX
+else()
+   set (ENABLE_SKYX 1)
+endif()
+set (ENABLE_OGRE_ASSET_EDITOR 1)    # Enables Ogre asset editor module.
+set (ENABLE_OPEN_ASSET_IMPORT 0)    # Enables Open Asset Import Library, which can be used to import various mesh formats.
+set (ENABLE_PROFILING 1)            # Enable the following flag to add compile with support for a built-in execution time profiler.
+set (ENABLE_JS_PROFILING 0)         # Enable js profiling?
+set (ENABLE_MEMORY_LEAK_CHECKS 0)   # If the following flag is defined, memory leak checking is enabled in all modules when building on MSVC.
+
+# Android overrides as we cant use -D<option> in Tundra.
+set (ENABLE_SKYX 0)
+set (ENABLE_HYDRAX 0)
+set (ENABLE_OGRE_ASSET_EDITOR 0)
+set (ENABLE_PROFILING 0) 
+
+message ("\n")
+
+if (ENABLE_PROFILING)
+    add_definitions (-DPROFILING)
+endif ()
+if (ENABLE_JS_PROFILING)
+    add_definitions (-DENABLE_JS_PROFILING)
+endif()
+if (ENABLE_HYDRAX)
+    configure_hydrax()
+endif()
+if (ENABLE_SKYX)
+    configure_skyx()
+endif()
+if (MSVC AND ENABLE_MEMORY_LEAK_CHECKS)
+    add_definitions(-DMEMORY_LEAK_CHECK)
+endif()
+if (MSVC AND ENABLE_BUILD_OPTIMIZATIONS)
+    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Gy /GF /Ox /Ob2 /Ot /fp:fast /MP")
+    set (CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELEASE})
+    set (CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG /INCREMENTAL:NO /OPT:REF /OPT:ICF")
+    set (CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO ${CMAKE_SHARED_LINKER_FLAGS_RELEASE})
+    set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /INCREMENTAL:NO /OPT:REF /OPT:ICF")
+    set (CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO ${CMAKE_EXE_LINKER_FLAGS_RELEASE})
+endif ()
+
+###### ENTITY COMPONENTS ######
+
+message ("\n=========== Configuring Entity-Components ===========\n")
+
+## The AddEntityComponent macros must appear before any of the add_subdirectory() directives for modules that use the ECs, or otherwise
+## they will not be able to conditionally compile the EC.
+
+## The following EC's are declared by TundraProtocolModule and are optional.
+## You may comment these lines out to disable any ECs you do not want to include.
+
+AddEntityComponent(EC_Highlight)
+AddEntityComponent(EC_Sound)
+AddEntityComponent(EC_HoveringText)
+AddEntityComponent(EC_ParticleSystem)
+AddEntityComponent(EC_Billboard)
+AddEntityComponent(EC_TransformGizmo)
+
+## Here are the Application level ECs that wont be added if BUILD_SDK_ONLY is TRUE (default is FALSE)
+
+if (NOT BUILD_SDK_ONLY)
+    AddEntityComponent(EC_Script)                   # Optional but used by both PythonScriptModule and JavascriptModule.
+    AddEntityComponent(EC_PlanarMirror)
+    AddEntityComponent(EC_ProximityTrigger)
+    AddEntityComponent(EC_LaserPointer)
+endif()
+
+###### REQUIRED STATIC FRAMEWORK ######
+
+message ("\n=========== Configuring Static Framework ===========\n")
+
+## The following are the core modules/libs that are required 
+## for the project to build. None of these can be omitted.
+
+AddProject(Core Math)
+AddProject(Core Framework)
+AddProject(Core Scene)
+
+# The Tundra project builds the main exe as a WINDOWS subsystem (or as a unix executable).
+AddProject(Core Tundra)
+
+# For Windows, also add a version of the project which builds using CONSOLE subsystem.
+# This is otherwise equivalent to the Tundra executable, but this one always shows the console window.
+if (MSVC)
+AddProject(Core TundraConsole)
+endif()
+
+AddProject(Core Asset)
+AddProject(Core Audio)
+AddProject(Core Console)
+AddProject(Core Input)
+AddProject(Core Ui)
+
+###### REQUIRED MODULES ######
+
+message ("\n=========== Configuring Required Modules ===========\n")
+
+## Here we should have module that are required to build the SDK at minimum
+
+AddProject(Core OgreRenderingModule)
+AddProject(Core TundraProtocolModule)
+AddProject(Core AssetModule)
+AddProject(Core EnvironmentModule)      # Optional in theory, if you drop PhysicsModule. Depends on OgreRenderingModule.
+AddProject(Core PhysicsModule)          # Optional in theory, if your application doesn't need physics. Depends on OgreRenderingModule and EnvironmentModule.
+
+###### OPTIONAL MODULES ######
+
+message ("\n=========== Configuring Optional Modules ===========\n")
+
+# ANDROID AddProject(Core ECEditorModule)                 # Provides tools for managing scenes, entities, entity-components and assets.
+AddProject(Application AvatarModule)            # Provides EC_Avatar. Depends on OgreRenderingModule.
+# ANDROID AddProject(Application DebugStatsModule)        # Enables a developer window for debugging. Depends on OgreRenderingModule and EnvironmentModule.
+AddProject(Application SkyXHydrax)              # Provides photorealistic sky and water components by utilizing SkyX and Hydrax Ogre add-ons.
+AddProject(Application SceneWidgetComponents)   # Provide ECs for injecting various QWidgets to the 3D scene eg. EC_WebView.
+AddProject(Application JavascriptModule)        # Allows QtScript-created scene script instances.
+if (NOT APPLE) # Python and PythonQt are not available currently on Mac.
+    if ("$ENV{TUNDRA_PYTHON_ENABLED}" STREQUAL "TRUE") 
+        AddProject(Application PythonScriptModule)      # Allows Python-created modules and scene script instances. Depends on OgreRenderingModule, TundraLogicModule, AvatarModule SceneWidgetComponents
+    endif ()
+endif()
+# ANDROID AddProject(Application BrowserUiPlugin)         # Adds a browser ui to the viewer. Features multi tabbed browsing, web login to servers, classic login, world/web bookmarks, web page caching etc.
+
+# Remove the win32 check once the mumble and vlc deps are fetched in the linux build scripts. 
+# For MumblePlugin this is same as apt-get libspeex and protobuf ~2.4.1 and VlcPlugin apt-get libvlc-dev.
+if (WIN32)
+    AddProject(Application MumblePlugin)        # VOIP communication, implements a Mumble client for the Murmur server. Depends on JavascriptModule, OgreRenderingModule and TundraProtocolModule.
+    AddProject(Application VlcPlugin)           # Adds media playback capabilities with libVLC and entity components.
+endif ()
+
+#AddProject(Application KinectModule)           # Reads Kinect for video, depth and skeleton data and emits it from the 'kinect' dynamic object. Only works on Windows with Visual Studio 10 with VC100 compiler.
+# ANDROID AddProject(Application CAVEStereoModule)       # Provides multi windowed rendering views for CAVE setups and stereoscopy view modes.
+#AddProject(Application UpdateModule)           # Windows msi installer only. Adds 'Check For Updates' functionality.
+
+if (ENABLE_OGRE_ASSET_EDITOR)
+    AddProject(Application OgreAssetEditorModule)   # Enables various asset editors. Depends on OgreRenderingModule.
+endif ()
+
+if (ENABLE_OPEN_ASSET_IMPORT)
+    AddProject(Application OpenAssetImport)         # Allows import of various mesh file formats
+endif ()
+
+#AddProject(Application AssetInterestPlugin)    # Options to only keep assets below certain distance threshold in memory. Can also unload all non used assets from memory. Exposed to scripts so scenes can set the behaviour.
+AddProject(Application CanvasPlugin)           # Component that draws a graphics scene with any number of widgets into a mesh and provides 3D mouse input.
