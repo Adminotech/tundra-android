@@ -17,14 +17,15 @@ What you need to get started
 
 The following are the tools that have been tested/used while developing the scripts. The build OS used is ubuntu 12.04 desktop i386. At this moment I cannot give guarantees for other systems outside of this.
 
-* Android NDK r8 http://developer.android.com/sdk/ndk
-* CMake 2.8.x
-* Git
-* Svn
-* Mercurial/Hg
-* Curl
+* **SDK:** Android NDK r8 http://developer.android.com/sdk/ndk
+* **Build systems:** cmake (2.8.x)
+* **DVCS:** git, svn, mercurial
+* **Utils:** curl, wget, g++
 
-Ubuntu users can run this to get most `sudo apt-get install cmake cmake-data git subversion mercurial curl`
+<pre>
+# Ubuntu users can run the following for everything except NDK
+sudo apt-get install cmake cmake-data git subversion mercurial curl wget g++
+</pre>
 
 Details
 -------
