@@ -67,6 +67,7 @@ export SRCDIR=$BUILDDIR/src
 export TOOLCHAIN_DIR=$BUILDDIR/toolchain
 
 export COLOR_GREEN="\e[1;32m"
+export COLOR_BLUE="\e[1;34m"
 export COLOR_END="\e[00m"
 
 mkdir -p ${PREFIX}

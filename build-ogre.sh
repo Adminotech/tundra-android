@@ -37,6 +37,10 @@ if [ ! -f ${DETECTION_LIB} ] ; then
     make -j4
     make install
 
+    # Copy ogre prebuilt deps to install prefix
+    cp -u ${PREBUILT}/lib/* ${PREFIX}/lib/
+    cp -u -r ${PREBUILT}/include/* ${PREFIX}/include/
+
     popd
 else
     echo "-- Already built, remove ${DETECTION_LIB} to trigger a rebuild."
