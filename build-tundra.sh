@@ -20,6 +20,7 @@ fi
 
 pushd "${TUNDRA_SOURCE_DIR}"
 
+export TUNDRA_INSTALL_PATH=$(pwd)/android-install
 export TUNDRA_DEP_PATH=${PREFIX}
 export QTDIR=${PREFIX}
 export QMAKESPEC="android-g++"
@@ -29,12 +30,11 @@ export BULLET_DIR=${PREFIX}
 export OGRE_HOME=${PREFIX}
 export TUNDRA_PYTHON_ENABLED="FALSE"
 
-
 if [ ! -f CMakeCache.txt ] ; then
     echo
     echo -e "-- ${COLOR_BLUE}Running cmake${COLOR_END}"
-    ${CMAKE_ANDROID} -DTUNDRA_PLATFORM_ANDROID=TRUE -DTUNDRA_OGRE_STATIC=TRUE -DTUNDRA_NO_EDITORS=TRUE -DTUNDRA_NO_AUDIO=TRUE -DTUNDRA_NO_QTWEBKIT=TRUE .
-    
+    ${CMAKE_ANDROID} -DTUNDRA_PLATFORM_ANDROID=TRUE -DTUNDRA_OGRE_STATIC=TRUE -DTUNDRA_NO_EDITORS=TRUE -DTUNDRA_NO_AUDIO=TRUE -DTUNDRA_NO_QTWEBKIT=TRUE -DCMAKE_INSTALL_PREFIX=${TUNDRA_INSTALL_PATH} .
+
     echo
     echo -e "${COLOR_BLUE}Removing incorrect linker flags '-lrt' and '-lpthread'${COLOR_END}"
     for TARGET_FILENAME in "link.txt" "relink.txt" ; do
@@ -51,6 +51,21 @@ fi
 echo
 echo -e "${COLOR_BLUE}-- Running make${COLOR_END}"
 make -j4
+
+echo
+if [ ! -d ${TUNDRA_INSTALL_PATH} ] ; then
+    echo -e "${COLOR_BLUE}-- Running make install${COLOR_END}"
+    make install
+    
+    echo
+    echo -e "${COLOR_BLUE}-- Copying libs and headers to ${PREFIX}${COLOR_END}"
+    mkdir -p ${PREFIX}/include/tundra
+    cp -u ${TUNDRA_INSTALL_PATH}/bin/plugins/*.so ${PREFIX}/lib
+    cp -u $(pwd)/lib/*.a ${PREFIX}/lib
+    cp -u -r ${TUNDRA_INSTALL_PATH}/include/* ${PREFIX}/include/tundra
+else
+    echo -e "${COLOR_BLUE}-- 'make install' already done, remove ${TUNDRA_INSTALL_PATH} to reinstall.${COLOR_END}"
+fi
 
 popd
 echo
