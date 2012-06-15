@@ -28,7 +28,7 @@ set -e
 
 # Additional script modifications by Jonne Nauha
 
-echo "Building boost"
+echo -e "${COLOR_GREEN}Building boost${COLOR_END}"
 
 BOOST_SOURCE_NAME=boost_${BOOST_VERSION//./_}
 
@@ -154,7 +154,12 @@ else
     echo "-- Patches already applied, skipping."
 fi
 
-./b2 link=static threading=multi target-os=linux toolset=android-arm --layout=unversioned --without-python --without-mpi --without-locale --disable-filesystem3 define=BOOST_FILESYSTEM_VERSION=2 -d+2 install
+DETECTION_LIB=${PREFIX}/lib/libboost_thread.a
+if [ ! -f ${DETECTION_LIB} ] ; then
+    ./b2 link=static threading=multi target-os=linux toolset=android-arm --layout=unversioned --without-python --without-mpi --without-locale --disable-filesystem3 define=BOOST_FILESYSTEM_VERSION=2 -d+2 install
+else
+    echo "-- Already built, remove ${DETECTION_LIB} to trigger a rebuild."
+fi
 
 popd
 echo

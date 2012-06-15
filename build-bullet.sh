@@ -1,5 +1,5 @@
 
-echo "Building bullet"
+echo -e "${COLOR_GREEN}Building bullet${COLOR_END}"
 
 BULLET_DIR=bullet
 if [ ! -d ${BULLET_DIR} ] ; then
@@ -9,16 +9,22 @@ else
     echo "-- Repository already cloned, skipping."
 fi
 
-pushd "${BULLET_DIR}"
+DETECTION_LIB=${PREFIX}/lib/libBulletCollision.a
+if [ ! -f ${DETECTION_LIB} ] ; then
+    pushd "${BULLET_DIR}"
+    
+    mkdir -p build-android
+    cd build-android
 
-mkdir -p build-android
-cd build-android
+    ${CMAKE_ANDROID} -DBUILD_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -DINSTALL_LIBS=ON -DCMAKE_INSTALL_PREFIX=${PREFIX} ..
 
-${CMAKE_ANDROID} -DBUILD_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF -DINSTALL_LIBS=ON -DCMAKE_INSTALL_PREFIX=${PREFIX} ..
+    make -j4
+    make install
 
-make -j4
-make install
+    popd
+else
+    echo "-- Already built, remove ${DETECTION_LIB} to trigger a rebuild."
+fi
 
-popd
 echo
 

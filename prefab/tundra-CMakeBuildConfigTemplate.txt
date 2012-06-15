@@ -134,7 +134,9 @@ AddProject(Core PhysicsModule)          # Optional in theory, if your applicatio
 
 message ("\n=========== Configuring Optional Modules ===========\n")
 
-# ANDROID AddProject(Core ECEditorModule)                 # Provides tools for managing scenes, entities, entity-components and assets.
+if (NOT TUNDRA_NO_EDITORS)
+    AddProject(Core ECEditorModule)             # Provides tools for managing scenes, entities, entity-components and assets.
+endif ()
 AddProject(Application AvatarModule)            # Provides EC_Avatar. Depends on OgreRenderingModule.
 # ANDROID AddProject(Application DebugStatsModule)        # Enables a developer window for debugging. Depends on OgreRenderingModule and EnvironmentModule.
 AddProject(Application SkyXHydrax)              # Provides photorealistic sky and water components by utilizing SkyX and Hydrax Ogre add-ons.

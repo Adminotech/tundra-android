@@ -1,5 +1,5 @@
 
-echo "Building tundra"
+echo -e "${COLOR_GREEN}Building tundra${COLOR_END}"
 
 TUNDRA_SOURCE_DIR=tundra
 if [ ! -d ${TUNDRA_SOURCE_DIR} ] ; then
@@ -20,9 +20,6 @@ fi
 
 pushd "${TUNDRA_SOURCE_DIR}"
 
-mkdir -p build-android
-cd build-android
-
 export TUNDRA_DEP_PATH=${PREFIX}
 export QTDIR=${PREFIX}
 export QMAKESPEC="android-g++"
@@ -33,9 +30,9 @@ export OGRE_HOME=${PREFIX}
 export TUNDRA_PYTHON_ENABLED="FALSE"
 
 echo "-- Running cmake"
-${CMAKE_ANDROID} -DTUNDRA_PLATFORM_ANDROID=TRUE -DTUNDRA_OGRE_STATIC=TRUE ..
+${CMAKE_ANDROID} -DTUNDRA_PLATFORM_ANDROID=TRUE -DTUNDRA_OGRE_STATIC=TRUE -DTUNDRA_NO_EDITORS=TRUE -DTUNDRA_NO_AUDIO=TRUE .
 
-echo "**** Cmake prolly failed. Building Tundra is not completed! ****"
+make
 
 popd
 echo

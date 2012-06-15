@@ -28,7 +28,7 @@ set -e
 
 # Additional script modifications by Jonne Nauha
 
-echo "Building bzip2"
+echo -e "${COLOR_GREEN}Building bzip2${COLOR_END}"
 
 # Download source
 if [ ! -e "bzip2-${BZIP2_VERSION}.tar.gz" ] ; then
@@ -39,29 +39,35 @@ if [ ! -e "bzip2-${BZIP2_VERSION}.tar.gz" ] ; then
     tar xvf "bzip2-${BZIP2_VERSION}.tar.gz"
     cp ${PREFAB}/Makefile.bzip2 bzip2-${BZIP2_VERSION}/Makefile
 else
-    echo "-- Already downloaded sources and makefile"
+    echo "-- Already downloaded sources, skipping."
 fi
 
 # Build
-pushd "bzip2-${BZIP2_VERSION}"
-BIGFILES=-D_FILE_OFFSET_BITS=64
-export CC=${DROIDTOOLS}-gcc
-export LD=${DROIDTOOLS}-ld
-export CPP=${DROIDTOOLS}-cpp
-export CXX=${DROIDTOOLS}-g++
-export AR=${DROIDTOOLS}-ar
-export AS=${DROIDTOOLS}-as
-export NM=${DROIDTOOLS}-nm
-export STRIP=${DROIDTOOLS}-strip
-export CXXCPP=${DROIDTOOLS}-cpp
-export RANLIB=${DROIDTOOLS}-ranlib
-export LDFLAGS="-Os -fpic -Wl,-rpath-link=${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib -L${ROOTDIR}/lib"
-export CFLAGS="-Os -D_FILE_OFFSET_BITS=64 -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include -g ${BIGFILES}"
-export CXXFLAGS="-Os -D_FILE_OFFSET_BITS=64 -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include"
+DETECTION_LIB=${PREFIX}/lib/libbz2.a
+if [ ! -f ${DETECTION_LIB} ] ; then
+    pushd "bzip2-${BZIP2_VERSION}"
+    BIGFILES=-D_FILE_OFFSET_BITS=64
+    export CC=${DROIDTOOLS}-gcc
+    export LD=${DROIDTOOLS}-ld
+    export CPP=${DROIDTOOLS}-cpp
+    export CXX=${DROIDTOOLS}-g++
+    export AR=${DROIDTOOLS}-ar
+    export AS=${DROIDTOOLS}-as
+    export NM=${DROIDTOOLS}-nm
+    export STRIP=${DROIDTOOLS}-strip
+    export CXXCPP=${DROIDTOOLS}-cpp
+    export RANLIB=${DROIDTOOLS}-ranlib
+    export LDFLAGS="-Os -fpic -Wl,-rpath-link=${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib -L${ROOTDIR}/lib"
+    export CFLAGS="-Os -D_FILE_OFFSET_BITS=64 -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include -g ${BIGFILES}"
+    export CXXFLAGS="-Os -D_FILE_OFFSET_BITS=64 -pipe -isysroot ${SYSROOT} -I${ROOTDIR}/include"
 
-make CC="${CC}" AR="${AR}" RANLIB="${RANLIB}" CFLAGS="${CFLAGS}"
-make install PREFIX=${PREFIX}  # Ignore errors due to share libraries missing
+    make CC="${CC}" AR="${AR}" RANLIB="${RANLIB}" CFLAGS="${CFLAGS}"
+    make install PREFIX=${PREFIX}  # Ignore errors due to share libraries missing
 
-popd
+    popd
+else
+    echo "-- Already built, remove ${DETECTION_LIB} to trigger a rebuild."
+fi
+
 echo
 

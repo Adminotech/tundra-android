@@ -66,20 +66,23 @@ export PREBUILT=$BUILDDIR/prebuilt
 export SRCDIR=$BUILDDIR/src
 export TOOLCHAIN_DIR=$BUILDDIR/toolchain
 
+export COLOR_GREEN="\e[1;32m"
+export COLOR_END="\e[00m"
+
 mkdir -p ${PREFIX}
 mkdir -p ${SRCDIR}
 
 echo
 if [ ! -d "${TOOLCHAIN_DIR}" ]; then
-	echo "Creating toolchain for platform to ${TOOLCHAIN_DIR}..."
+	echo -e "${COLOR_GREEN}Creating toolchain for platform to ${TOOLCHAIN_DIR}${COLOR_END}"
 	$NDK/build/tools/make-standalone-toolchain.sh \
 		--platform=android-${ANDROID_API_LEVEL} \
 		--toolchain=${PLATFORM}-${TOOLCHAIN_VERSION} \
 		--install-dir=${TOOLCHAIN_DIR}
+	echo
 else
-    echo "Toolchain exists in ${TOOLCHAIN_DIR}, skipping creation..."
+    echo -e "${COLOR_GREEN}Using existing toolchain from ${TOOLCHAIN_DIR}${COLOR_END}"
 fi
-echo
 
 export ARCH=${ARM_TARGET}
 export ROOTDIR=${SRCDIR}
@@ -90,11 +93,11 @@ export ANDROID_STANDALONE_TOOLCHAIN=${TOOLCHAIN_DIR}
 export CMAKE_INSTALL_PREFIX=${PREFIX}
 export CMAKE_ANDROID="cmake -DCMAKE_TOOLCHAIN_FILE=$PREFAB/android.toolchain.cmake "
 
-echo "-- Arch     : ${ARCH}"
-echo "-- Api      : android-${ANDROID_API_LEVEL}"
-echo "-- Sysroot  : ${SYSROOT}"
-echo "-- Prefix   : ${PREFIX}"
-echo "-- CMake toolchain : $PREFAB/android.toolchain.cmake"
+echo "-- Arch            = ${ARCH}"
+echo "-- Api             = android-${ANDROID_API_LEVEL}"
+echo "-- Sysroot         = ${SYSROOT}"
+echo "-- Install prefix  = ${PREFIX}"
+echo "-- CMake toolchain = $PREFAB/android.toolchain.cmake"
 echo
 
 pushd $SRCDIR
@@ -117,7 +120,6 @@ ${TOPDIR}/build-tundra.sh
 popd
 
 echo
-echo "Android build completed"
-echo "-- Results can be found from ${PREFIX}"
+echo -e "${COLOR_GREEN}Tundra for Android build completed${COLOR_END}"
 echo
 
