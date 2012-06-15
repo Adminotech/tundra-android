@@ -5,13 +5,6 @@ This repository aims to provide automated scripts to build [Tundra] and its depe
 
 I'm open for pull requests. Send them up my way!
 
-Disclaimer
-----------
-
-This is very much work in progress. If you decide to use the scripts here remember that they can change at will. Once we get to building Tundra dependencies might get changed from static to dynamic etc. Additionally if new Android NDK/SDK releases are made this will affect the scripts.
-
-As you might notice from my .sh scripts, I'm no linux expert. Try to cope with them or send pull requests!
-
 What you need to get started
 ----------------------------
 
@@ -27,14 +20,24 @@ The following are the tools that have been tested/used while developing the scri
 sudo apt-get install cmake cmake-data git subversion mercurial curl wget g++ p7zip-full
 </pre>
 
-Details
--------
+What you will get
+-----------------
 
-The scripts use various techniques I've picked up from looking at other repos around and combined them here. Special thanks to the folks maintainig these projects!
+At the moment the minimum set of dependencies are being built for a "core" Tundra built.
 
-* Android Ogre fork that I use from https://bitbucket.org/wolfmanfx/ogre Additionally his prebuilt ogre deps are currently used (this might change later).
-* CMake android toolchain from http://code.google.com/p/android-cmake/ `Modified further by me`
-* Boost and bzip2 automation from https://github.com/mevansam/cmoss `Modified further by me`
+* Boost 1.49.0
+* Bzip2 1.0.6 (for boost)
+* Ogre 1.8.0 unstable
+* Bullet 2.78
+* kNet stable branch
+* Necessitas Qt 4.8.0
+* Tundra
+* Prepared standalone NDK toolchain for your target arch (default armv7a)
+* CMake NDK toolchain script that can be used to easily build cmake based projects.
+
+_**Note:** Necessitas Qt does not build properly with the r8 or r7 NDK. Necessitas provided r6b is used instead. It is an open issue if this will affect the packaged Tundra app. We will cross that bridge when we get there._
+
+_**Note:** Currently prebuilt ogre deps are used from wolfmanfx. This will change in the future._
 
 Usage
 -----
@@ -46,5 +49,15 @@ cd tundra-android
 
 Sit back and enjoy, this will take a while. When you are done `install` folder has the build results.
 
+_**Note:** Do not run any of the other build-*.sh scripts directly, they wont work like that. The main script will call all of them in the correct order. The individual scripts have checks so that nothing is downloaded/cloned/built/installed unnessesarily multiple times. Only tundras make will be ran every time. The script will give info what files you need to remove to trigger rebuilds._
+
+Implementation Details
+----------------------
+
+The scripts use various techniques I've picked up from looking at other repos around and combined them here. Special thanks to the folks maintainig these projects!
+
+* Android Ogre fork that I use from https://bitbucket.org/wolfmanfx/ogre Additionally his prebuilt ogre deps are currently used (this might change later).
+* CMake android toolchain from http://code.google.com/p/android-cmake/ `Modified further by me`
+* Boost and bzip2 automation from https://github.com/mevansam/cmoss `Modified further by me`
 
 [Tundra]: https://github.com/realXtend/naali/tree/tundra2 "Tundra"
