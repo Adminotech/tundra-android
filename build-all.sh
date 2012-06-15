@@ -111,9 +111,9 @@ ${TOPDIR}/build-ogre.sh
 
 ${TOPDIR}/build-bullet.sh
 
-${TOPDIR}/build-qt.sh
-
 ${TOPDIR}/build-knet.sh
+
+${TOPDIR}/build-qt.sh
 
 ${TOPDIR}/build-tundra.sh
 

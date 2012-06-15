@@ -1,4 +1,24 @@
 
+echo -e "${COLOR_GREEN}Preparing Necessitas Qt spesific NDK${COLOR_END}"
+
+if [ ! -f 6.1.2011.10.1android-ndk-r6b-linux-x86.7z ] ; then
+    echo "-- Downloading"
+    wget http://files.kde.org/necessitas/sdk_master/org.kde.necessitas.misc.ndk.r6/6.1.2011.10.1android-ndk-r6b-linux-x86.7z
+else
+    echo "-- Already downloaded, skipping."
+fi
+
+NECESSITAS_NDK_DIR=necessitas-ndk-r6b
+if [ ! -d ${NECESSITAS_NDK_DIR} ] ; then
+    echo "-- Extracting"
+    7za x 6.1.2011.10.1android-ndk-r6b-linux-x86.7z
+    mv android-ndk-r6b ${NECESSITAS_NDK_DIR}
+else
+    echo "-- Already extracted, skipping."
+fi
+NECESSITAS_NDK_PATH=$(pwd)/${NECESSITAS_NDK_DIR}
+echo
+
 echo -e "${COLOR_GREEN}Building qt${COLOR_END}"
 
 QT_SOURCE_DIR=qt
@@ -32,7 +52,7 @@ fi
 # Only build qt if not installed. This will go to a infinite loop if already built due to the android-qt script implementation!
 DETECTION_LIB=${PREFIX}/lib/libQtCore.a
 if [ ! -f ${DETECTION_LIB} ] ; then
-    ./android/androidconfigbuild.sh -q "${QT_CONF_ARG}" -h "${QT_BUILD_STATIC}" -n "${SDK}" -f "${PLATFORM}" -v "${TOOLCHAIN_VERSION}" -a "${QT_CPU_ARCH}" -i "${PREFIX}" -l "${ANDROID_API_LEVEL}" -w 1 -b 1 -k 1
+    ./android/androidconfigbuild.sh -q "${QT_CONF_ARG}" -h "${QT_BUILD_STATIC}" -n "${NECESSITAS_NDK_PATH}" -f "${PLATFORM}" -v "${TOOLCHAIN_VERSION}" -a "${QT_CPU_ARCH}" -i "${PREFIX}" -l 9 -w 1 -b 1 -k 1
 else
     echo "-- Already built, skipping due to android-qt script infinite loop bug. To trigger a rebuild:"
     echo "   cd src/qt && git clean -fdx && git checkout ./ && rm ${DETECTION_LIB}"

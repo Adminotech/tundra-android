@@ -140,7 +140,7 @@ endif ()
 AddProject(Application AvatarModule)            # Provides EC_Avatar. Depends on OgreRenderingModule.
 # ANDROID AddProject(Application DebugStatsModule)        # Enables a developer window for debugging. Depends on OgreRenderingModule and EnvironmentModule.
 AddProject(Application SkyXHydrax)              # Provides photorealistic sky and water components by utilizing SkyX and Hydrax Ogre add-ons.
-AddProject(Application SceneWidgetComponents)   # Provide ECs for injecting various QWidgets to the 3D scene eg. EC_WebView.
+# ANDROID AddProject(Application SceneWidgetComponents)   # Provide ECs for injecting various QWidgets to the 3D scene eg. EC_WebView.
 AddProject(Application JavascriptModule)        # Allows QtScript-created scene script instances.
 if (NOT APPLE) # Python and PythonQt are not available currently on Mac.
     if ("$ENV{TUNDRA_PYTHON_ENABLED}" STREQUAL "TRUE") 

@@ -20,11 +20,11 @@ The following are the tools that have been tested/used while developing the scri
 * **SDK:** Android NDK r8 http://developer.android.com/sdk/ndk
 * **Build systems:** cmake (2.8.x)
 * **DVCS:** git, svn, mercurial
-* **Utils:** curl, wget, g++
+* **Utils:** curl, wget, g++, 7za
 
 <pre>
 # Ubuntu users can run the following for everything except NDK
-sudo apt-get install cmake cmake-data git subversion mercurial curl wget g++
+sudo apt-get install cmake cmake-data git subversion mercurial curl wget g++ p7zip-full
 </pre>
 
 Details
