@@ -152,7 +152,7 @@ ${TOPDIR}/build-tundra.sh
 popd
 echo
 
-#${TOPDIR}/build-tundra-android.sh
+${TOPDIR}/build-tundra-android.sh
 
 echo
 echo -e "${COLOR_GREEN}Tundra for Android build completed${COLOR_END}"
