@@ -30,12 +30,11 @@ set -e
 
 echo -e "${COLOR_GREEN}Building boost${COLOR_END}"
 
-BOOST_SOURCE_NAME=boost_${BOOST_VERSION//./_}
-
+BOOST_SOURCE_NAME="boost_1_49_0"
 if [ ! -e "${BOOST_SOURCE_NAME}.tar.gz" ] ; then
     # Download source
     echo "-- Downloading sources"
-    curl $PROXY -O "http://surfnet.dl.sourceforge.net/project/boost/boost/${BOOST_VERSION}/${BOOST_SOURCE_NAME}.tar.gz"
+    curl -O "http://surfnet.dl.sourceforge.net/project/boost/boost/1.49.0/${BOOST_SOURCE_NAME}.tar.gz"
 
     # Extract source
     echo "-- Extracting sources"
@@ -52,7 +51,7 @@ if [ ! -f ./b2 ] ; then
     echo "-- Performing boost boostrap"
     ./bootstrap.sh
     if [ $? != 0 ] ; then
-	    echo "ERROR: Could not perform boostrap! See $TMPLOG for more info."
+        echo -e "${COLOR_RED}ERROR: Failed to perform boost bootstrap${COLOR_END}"
 	    exit 1
     fi
     
@@ -86,16 +85,16 @@ using android : arm : ${DROIDTOOLS}-g++ :
 <compileflags>-DANDROID
 <compileflags>-D__ANDROID__
 <compileflags>-DNDEBUG
-<compileflags>-I${SDK}/platforms/android-14/arch-arm/usr/include
-<compileflags>-I${SDK}/sources/cxx-stl/gnu-libstdc++/include
-<compileflags>-I${SDK}/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/include
+<compileflags>-I${NDK_ROOT}/platforms/android-14/arch-arm/usr/include
+<compileflags>-I${NDK_ROOT}/sources/cxx-stl/gnu-libstdc++/include
+<compileflags>-I${NDK_ROOT}/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a/include
 <compileflags>-I${ROOTDIR}/include
 <compileflags>-I${PREFIX}/include
 <linkflags>-nostdlib
 <linkflags>-lc
 <linkflags>-Wl,-rpath-link=${SYSROOT}/usr/lib
 <linkflags>-L${SYSROOT}/usr/lib
-<linkflags>-L${SDK}/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a
+<linkflags>-L${NDK_ROOT}/sources/cxx-stl/gnu-libstdc++/libs/armeabi-v7a
 <linkflags>-L${ROOTDIR}/lib
 <linkflags>-L${PREFIX}/lib
 # Flags above are for android

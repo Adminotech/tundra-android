@@ -31,13 +31,13 @@ set -e
 echo -e "${COLOR_GREEN}Building bzip2${COLOR_END}"
 
 # Download source
-if [ ! -e "bzip2-${BZIP2_VERSION}.tar.gz" ] ; then
-    curl $PROXY -O "http://bzip.org/${BZIP2_VERSION}/bzip2-${BZIP2_VERSION}.tar.gz"
+if [ ! -e "bzip2-1.0.6.tar.gz" ] ; then
+    curl -O "http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
 
     # Extract source
-    rm -rf "bzip2-${BZIP2_VERSION}"
-    tar xvf "bzip2-${BZIP2_VERSION}.tar.gz"
-    cp ${PREFAB}/Makefile.bzip2 bzip2-${BZIP2_VERSION}/Makefile
+    rm -rf "bzip2-1.0.6"
+    tar xvf "bzip2-1.0.6.tar.gz"
+    cp ${PREFAB}/Makefile.bzip2 bzip2-1.0.6/Makefile
 else
     echo "-- Already downloaded sources, skipping."
 fi
@@ -45,7 +45,7 @@ fi
 # Build
 DETECTION_LIB=${PREFIX}/lib/libbz2.a
 if [ ! -f ${DETECTION_LIB} ] ; then
-    pushd "bzip2-${BZIP2_VERSION}"
+    pushd "bzip2-1.0.6"
     BIGFILES=-D_FILE_OFFSET_BITS=64
     export CC=${DROIDTOOLS}-gcc
     export LD=${DROIDTOOLS}-ld
