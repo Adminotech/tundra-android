@@ -9,9 +9,29 @@
 #include <android_native_app_glue.h>
 
 #include "Framework.h"
+#include "Application.h"
+#include "CoreStringUtils.h"
+#include "QtUtils.h"
+#include "Color.h"
+#include "Transform.h"
 
-#define AndroidLogInfo(...) ((void)__android_log_print(ANDROID_LOG_INFO, "tundra", __VA_ARGS__))
-#define AndroidLogWarning(...) ((void)__android_log_print(ANDROID_LOG_WARN, "tundra", __VA_ARGS__))
+#include "AssetAPI.h"
+#include "ConsoleAPI.h"
+#include "SceneAPI.h"
+#include "InputAPI.h"
+#include "UiAPI.h"
+
+#include <QVariant>
+#include <QVariantList>
+#include <QList>
+#include <QStringList>
+#include <QByteArray>
+#include <QVarLengthArray>
+#include <QDir>
+#include <QFile>
+
+#include "FunctionInvoker.h"
+#include "LoggingFunctions.h"
 
 struct engine 
 {
@@ -43,90 +63,130 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd)
     {
         case APP_CMD_SAVE_STATE:
         {
-            AndroidLogInfo("APP_CMD_SAVE_STATE");
+            LogInfo("APP_CMD_SAVE_STATE");
             break;
         }
         case APP_CMD_INIT_WINDOW:
         {
-            AndroidLogInfo("APP_CMD_INIT_WINDOW");
+            LogInfo("APP_CMD_INIT_WINDOW");
             break;
         }
         case APP_CMD_TERM_WINDOW:
         {
-            AndroidLogInfo("APP_CMD_TERM_WINDOW");
+            LogInfo("APP_CMD_TERM_WINDOW");
             break;
         }
         case APP_CMD_GAINED_FOCUS:
         {
-            AndroidLogInfo("APP_CMD_GAINED_FOCUS");
+            LogInfo("APP_CMD_GAINED_FOCUS");
             break;
         }
         case APP_CMD_LOST_FOCUS:
         {
-            AndroidLogInfo("APP_CMD_LOST_FOCUS");
+            LogInfo("APP_CMD_LOST_FOCUS");
+            break;
+        }
+        case APP_CMD_START:
+        {
+            LogInfo("APP_CMD_START");
+            break;
+        }
+        case APP_CMD_RESUME:
+        {
+            LogInfo("APP_CMD_RESUME");
+            break;
+        }
+        case APP_CMD_DESTROY:
+        {
+            LogInfo("APP_CMD_DESTROY");
             break;
         }
     }
 }
 
-/**
- * This is the main entry point of a native application that is using
- * android_native_app_glue.  It runs in its own thread, with its own
- * event loop for receiving input events and doing other things.
- */
+/** The NDK strips static libraries very aggressively
+    to save disk etc. on the mobile devices.
+    This leads it stripping some parts away that are
+    actually needed in the linking step. This  can be
+    avoided by calling these functions to 'mark' them
+    down, so they wont get stripped.
+    
+    This looks like a hack, and it is. But it seems to
+    be common practive here as Android shipped 
+    android_native_app_glue also uses this same trick. 
+*/
+void tundra_dummy(Framework *framework)
+{
+    // android_native_app_glue
+    app_dummy();
+       
+    // Static framework functions
+    ParseBool(QString(""));
+    DirectorySearch("./",false, QDir::Files);
+
+    // Framework classes/functions
+    Color c; c.SerializeToString();
+    Transform t; t.SerializeToString();
+        
+    AssetAPI::RecursiveFindFile("./", "");
+    FunctionInvoker::NumArgsForFunction(framework, "dummy_function()");
+}
+
+/** This is the main entry point of a native application that is using
+    android_native_app_glue.  It runs in its own thread, with its own
+    event loop for receiving input events and doing other things. 
+*/
 void android_main(struct android_app* state) 
 {
     struct engine engine;
 
-    // Make sure glue isn't stripped.
-    app_dummy();
+    LogInfo("Initializing native activity.");
 
-    AndroidLogInfo("android_main() Start");
-    
     memset(&engine, 0, sizeof(engine));
     state->userData = &engine;
     state->onAppCmd = engine_handle_cmd;
     state->onInputEvent = engine_handle_input;
-
     engine.app = state;
-    //engine.framework = new Framework(0, 0);
     
-    while (1) 
+    QString configFile;
+    
+    // List data files
+    QDir dataDir(engine.app->activity->internalDataPath);
+    LogInfo("Data files in " + dataDir.absolutePath());
+    foreach(QString filePath, DirectorySearch(dataDir.absolutePath(), true, QDir::Files))
     {
-        // Read all pending events.
-        int ident; int events; struct android_poll_source* source;
-
-        // If not animating, we will block forever waiting for events.
-        // If animating, we loop until all events are read, then continue
-        // to draw the next frame of animation.
-        while ((ident = ALooper_pollAll(-1 /*0*/, NULL, &events, (void**)&source)) >= 0)
-        {
-            // Process this event.
-            if (source != NULL)
-                source->process(state, source);
-
-            // If a sensor has data, process it now.
-            if (ident == LOOPER_ID_USER) 
-            {
-
-            }
-
-            if (state->destroyRequested != 0) 
-                break;
-        }
-
-        // Check if we are exiting.        
-        if (state->destroyRequested != 0) 
-            break;
-        
-        // Update framework
+        if (filePath.endsWith("viewer-android.xml"))
+            configFile = filePath;
+        LogInfo("-- " + filePath);
     }
     
-    //delete engine.framework;
+    // Framework expects first param to be the executable name.
+    QList<QByteArray> args;
+    args << "tundra"
+         << "--headless"
+         << "--debuglevel" << "debug";
     
-    AndroidLogInfo("android_main() Exit");
+    // Find config file and pass it
+    if (!configFile.isEmpty())
+        args << "--config" << configFile.toAscii();
+    else
+        LogError("Config file not found from data path!");
+
+    /// Convert the arguments into a proper form
+    QVarLengthArray<char*, 64> tundraArgs(args.size());
+    for (int i = 0; i < args.size(); ++i)
+        tundraArgs[i] = args[i].data();
+
+    engine.framework = new Framework(tundraArgs.size(), tundraArgs.data());
+    tundra_dummy(engine.framework);
+    
+    engine.framework->Go();
+    
+    LogInfo("Deleting Framework.");
+    delete engine.framework;
+    
+    LogInfo("Exiting native activity.");
 }
 
 //END_INCLUDE(all)
-
 

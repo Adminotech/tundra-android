@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<Tundra>
+  <plugin path="OgreRenderingModule" />
+  <!-- <plugin path="EnvironmentModule" />           EnvironmentModule depends on OgreRenderingModule -->
+  <!-- <plugin path="PhysicsModule" />               PhysicsModule depends on OgreRenderingModule and EnvironmentModule -->
+  <!-- <plugin path="TundraProtocolModule" />        TundraProtocolModule depends on OgreRenderingModule -->
+  <!-- <plugin path="JavascriptModule" />            JavascriptModule depends on TundraProtocolModule --> 
+  <!-- <plugin path="AssetModule" />                 AssetModule depends on TundraProtocolModule -->
+  <!-- <plugin path="AvatarModule" />                AvatarModule depends on AssetModule and OgreRenderingModule -->
+  <!-- <plugin path="CanvasPlugin" />                Depends on OgreRenderingModule -->
+
+  <!--
+  <jsplugin path="cameraapplication.js" />
+  <jsplugin path="FirstPersonMouseLook.js" />
+  <jsplugin path="MenuBar.js" />
+  <jsplugin path="RendererSettings.js" />
+  <jsplugin path="SoundSettings.js" />
+  <jsplugin path="LoginScreen.js" />
+  <jsplugin path="LoadingScreen.js" />
+  -->
+
+  <option name="--trustserverstorages" />
+  <option name="--accept_unknown_http_sources" />
+  <option name="--accept_unknown_local_sources" />
+  <option name="--fpslimit" value="30" />
+  <option name="--splash" />
+</Tundra>

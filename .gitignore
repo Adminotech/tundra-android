@@ -1,4 +1,10 @@
 install
 src
 toolchain
+
+build-android/libs
+build-android/bin
+build-android/obj
+
 *~
+
