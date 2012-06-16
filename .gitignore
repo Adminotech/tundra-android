@@ -5,6 +5,7 @@ toolchain
 build-android/libs
 build-android/bin
 build-android/obj
+build-android/local.properties
 
 *~
 
