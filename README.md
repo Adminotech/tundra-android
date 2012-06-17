@@ -10,20 +10,20 @@ What you need to get started
 
 The following are the tools that have been tested/used while developing the scripts. The build OS used is ubuntu 12.04 desktop i386. At this moment I cannot give guarantees for other systems outside of this.
 
-* **SDK:** Android NDK r8 http://developer.android.com/sdk/ndk
+* **NDK:** Android NDK r8 http://developer.android.com/sdk/ndk
+* **SDK:** Android SDK r18 http://developer.android.com/sdk
+* **ADT:** Android ADT r19/r20preview http://tools.android.com/download
 * **Build systems:** cmake (2.8.x)
 * **DVCS:** git, svn, mercurial
 * **Utils:** curl, wget, g++, 7za
 
 <pre>
-# Ubuntu users can run the following for everything except NDK
+# Ubuntu users can run the following for everything except Android tools
 sudo apt-get install cmake cmake-data git subversion mercurial curl wget g++ p7zip-full
 </pre>
 
 What you will get
 -----------------
-
-At the moment the minimum set of dependencies are being built for a "core" Tundra built.
 
 * Boost 1.49.0
 * Bzip2 1.0.6 (for boost)
@@ -32,8 +32,9 @@ At the moment the minimum set of dependencies are being built for a "core" Tundr
 * kNet stable branch
 * Necessitas Qt 4.8.0
 * Tundra
-* Prepared standalone NDK toolchain for your target arch (default armv7a)
-* CMake NDK toolchain script that can be used to easily build cmake based projects.
+* Tundra for Android apk package
+
+As a bonus you get a prepared standalone NDK toolchain for your target arch (default armv7a) and CMake NDK toolchain script that can be used to easily build cmake based c/c++ projects.
 
 _**Note:** Necessitas Qt does not build properly with the r8 or r7 NDK. Necessitas provided r6b is used instead. It is an open issue if this will affect the packaged Tundra app. We will cross that bridge when we get there._
 
@@ -44,10 +45,26 @@ Usage
 
 <pre>
 cd tundra-android
-./build-all.sh /path/to/ndk
+./build-all.sh OPTIONS
+
+Options:
+  -n,  --ndk <i>path</i>      Android NDK root path
+  -s,  --sdk <i>path</i>      Android SDK root path
+
+  -od, --only-deps     Only build dependencies
+  -ot, --only-tundra   Only build Tundra
+  -oa, --only-android  Only build/package/install Tundra for Android 
+
+  -sd, --skip-deps     Skip Tundra dependencies
+  -st, --skip-tundra   Skip Tundra
+  -sa, --skip-android  Skip Tundra for Android build/package/install
+
+  -h, --help           Print this help
+
+Note: Params cannot be combined (eg. -odh).
 </pre>
 
-Sit back and enjoy, this will take a while. When you are done `install` folder has the build results.
+Sit back and enjoy, this will take a while. When you are done `install` folder has the deps and tundra build results. `build-android/bin` and `build-android/libs` will have the Android build results.
 
 _**Note:** Do not run any of the other build-*.sh scripts directly, they wont work like that. The main script will call all of them in the correct order. The individual scripts have checks so that nothing is downloaded/cloned/built/installed unnessesarily multiple times. Only tundras make will be ran every time. The script will give info what files you need to remove to trigger rebuilds._
 

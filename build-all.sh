@@ -1,61 +1,89 @@
 #!/bin/bash
 set -e
 
-# Copyright (c) 2011, Mevan Samaratunga
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
-#       documentation and/or other materials provided with the distribution.
-#     * The name of Mevan Samaratunga may not be used to endorse or
-#       promote products derived from this software without specific prior
-#       written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL PIERRE-OLIVIER LATOUR BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-# Additional script implementation by Jonne Nauha
-
 print_help()
 {
 cat << EOF
 Usage: $0 OPTIONS
 
 Options:
-  --ndk        Android NDK root path
-  --sdk        Android SDK root path
-  --help, -h   Print this help
+  -n,  --ndk <path>    Android NDK root path
+  -s,  --sdk <path>    Android SDK root path
+
+  -od, --only-deps     Only build dependencies
+  -ot, --only-tundra   Only build Tundra
+  -oa, --only-android  Only build/package/install Tundra for Android 
+
+  -sd, --skip-deps     Skip Tundra dependencies
+  -st, --skip-tundra   Skip Tundra
+  -sa, --skip-android  Skip Tundra for Android build/package/install
+
+  -h, --help           Print this help
+
+Note: Params cannot be combined (eg. -odh).
 
 EOF
 }
 
+# Color print helpers
+export COLOR_GREEN="\e[1;32m"
+export COLOR_BLUE="\e[1;34m"
+export COLOR_RED="\e[1;31m"
+export COLOR_END="\e[00m"
+
+# Input params
 INPUT_NDK=""
 INPUT_SDK=""
+INPUT_SKIP_DEPS="FALSE"
+INPUT_ONLY_DEPS="FALSE"
+INPUT_SKIP_TUNDRA="FALSE"
+INPUT_ONLY_TUNDRA="FALSE"
+INPUT_SKIP_ANDROID="FALSE"
+INPUT_ONLY_ANDROID="FALSE"
 
+# Parse command line args
 while [[ $1 = -* ]]; do
     arg=$1; 
     shift
 
     case $arg in
-        --ndk)
+        --ndk|-n)
             INPUT_NDK="$1"
             shift
             ;;
-        --sdk)
+        --sdk|-s)
             INPUT_SDK="$1"
             shift
+            ;;
+        --skip-deps|-sd)
+            INPUT_SKIP_DEPS="TRUE"
+            ;;
+        --skip-tundra|-st)
+            INPUT_SKIP_TUNDRA="TRUE"
+            ;;
+        --skip-android|-sa)
+            INPUT_SKIP_ANDROID="TRUE"
+            ;;
+        --only-deps|-od)
+            if [ "${INPUT_ONLY_TUNDRA}" == "TRUE" ] || [ "${INPUT_ONLY_ANDROID}" == "TRUE" ] ; then
+                echo -e "${COLOR_RED}Error: Passing multiple --only-<step> parameters is not allowed!${COLOR_END}"
+                exit 1
+            fi
+            INPUT_ONLY_DEPS="TRUE"
+            ;;
+        --only-tundra|-ot)
+            if [ "${INPUT_ONLY_DEPS}" == "TRUE" ] || [ "${INPUT_ONLY_ANDROID}" == "TRUE" ] ; then
+                echo -e "${COLOR_RED}Error: Passing multiple --only-<step> parameters is not allowed!${COLOR_END}"
+                exit 1
+            fi
+            INPUT_ONLY_TUNDRA="TRUE"
+            ;;
+        --only-android|-oa)
+            if [ "${INPUT_ONLY_DEPS}" == "TRUE" ] || [ "${INPUT_ONLY_TUNDRA}" == "TRUE" ] ; then
+                echo -e "${COLOR_RED}Error: Passing multiple --only-<step> parameters is not allowed!${COLOR_END}"
+                exit 1
+            fi
+            INPUT_ONLY_ANDROID="TRUE"
             ;;
         --help|-h)
             print_help
@@ -64,15 +92,31 @@ while [[ $1 = -* ]]; do
     esac
 done
 
-if [ "${INPUT_NDK}" == "" ] || [ ! -e ${INPUT_NDK}/build/tools/make-standalone-toolchain.sh ]; then
-	print_help
-	exit 0
+if [ "${INPUT_NDK}" == "" ] || [ ! -e ${INPUT_NDK}/build/tools/make-standalone-toolchain.sh ] ; then
+    echo -e "${COLOR_RED}Error: --ndk not passed or invalid. See $0 --help${COLOR_END}"
+	exit 1
 fi
-if [ "${INPUT_SDK}" == "" ] || [ ! -e ${INPUT_SDK}/tools/android ]; then
-	print_help
-	exit 0
+if [ "${INPUT_SDK}" == "" ] || [ ! -e ${INPUT_SDK}/tools/android ] ; then
+    echo -e "${COLOR_RED}Error: --sdk not passed or invalid. See $0 --help${COLOR_END}"
+	exit 1
+fi
+if [ "${INPUT_ONLY_DEPS}" == "TRUE" ] ; then
+    INPUT_SKIP_DEPS="FALSE"    
+    INPUT_SKIP_TUNDRA="TRUE"
+    INPUT_SKIP_ANDROID="TRUE"
+fi
+if [ "${INPUT_ONLY_TUNDRA}" == "TRUE" ] ; then
+    INPUT_SKIP_DEPS="TRUE"    
+    INPUT_SKIP_TUNDRA="FALSE"
+    INPUT_SKIP_ANDROID="TRUE"
+fi
+if [ "${INPUT_ONLY_ANDROID}" == "TRUE" ] ; then
+    INPUT_SKIP_DEPS="TRUE"    
+    INPUT_SKIP_TUNDRA="TRUE"
+    INPUT_SKIP_ANDROID="FALSE"
 fi
 
+# Set root paths
 export NDK_ROOT="${INPUT_NDK}"
 export SDK_ROOT="${INPUT_SDK}"
 
@@ -91,12 +135,6 @@ export PREFAB=$BUILDDIR/prefab
 export PREBUILT=$BUILDDIR/prebuilt
 export SRCDIR=$BUILDDIR/src
 export TOOLCHAIN_DIR=$BUILDDIR/toolchain
-
-# Color print helpers
-export COLOR_GREEN="\e[1;32m"
-export COLOR_BLUE="\e[1;34m"
-export COLOR_RED="\e[1;31m"
-export COLOR_END="\e[00m"
 
 # Create working dirctories
 mkdir -p ${PREFIX}
@@ -135,24 +173,31 @@ echo
 pushd $SRCDIR
 echo
 
-${TOPDIR}/build-bzip2.sh
+if [ "${INPUT_SKIP_DEPS}" == "FALSE" ] ; then
+    ${TOPDIR}/build-bzip2.sh
+    ${TOPDIR}/build-boost.sh
+    ${TOPDIR}/build-ogre.sh
+    ${TOPDIR}/build-bullet.sh
+    ${TOPDIR}/build-knet.sh
+    ${TOPDIR}/build-qt.sh
+else
+    echo -e "${COLOR_BLUE}Skipping Tundra dependecies build by request${COLOR_END}"
+fi
 
-${TOPDIR}/build-boost.sh
-
-${TOPDIR}/build-ogre.sh
-
-${TOPDIR}/build-bullet.sh
-
-${TOPDIR}/build-knet.sh
-
-${TOPDIR}/build-qt.sh
-
-${TOPDIR}/build-tundra.sh
+if [ "${INPUT_SKIP_TUNDRA}" == "FALSE" ] ; then
+    ${TOPDIR}/build-tundra.sh
+else
+    echo -e "${COLOR_BLUE}Skipping Tundra build by request${COLOR_END}"
+fi
 
 popd
 echo
 
-${TOPDIR}/build-tundra-android.sh
+if [ "${INPUT_SKIP_ANDROID}" == "FALSE" ] ; then
+    ${TOPDIR}/build-tundra-android.sh
+else
+    echo -e "${COLOR_BLUE}Skipping Tundra for Android build by request${COLOR_END}"
+fi
 
 echo
 echo -e "${COLOR_GREEN}Tundra for Android build completed${COLOR_END}"
