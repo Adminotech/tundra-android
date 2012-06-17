@@ -61,7 +61,13 @@ Options:
 
   -h, --help           Print this help
 
-Note: Params cannot be combined (eg. -odh).
+  Note: Params cannot be combined (eg. -odhsa).
+  
+Environment variables:
+  ANDROID_NDK_ROOT     Read as --ndk if the option is not passed
+  ANDROID_SDK_ROOT     Read as --sdk if the option is not passed
+
+  These are optional. Saves you typing of --sdk and --ndk for every run.
 </pre>
 
 Sit back and enjoy, this will take a while. When you are done `install` folder has the deps and tundra build results. `build-android/bin` and `build-android/libs` will have the Android build results.

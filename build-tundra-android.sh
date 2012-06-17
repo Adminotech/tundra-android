@@ -18,13 +18,23 @@ if [ $? != 0 ] ; then
     exit 1
 fi
 
+if [ ! -f local.properties ] ; then
+    echo
+    echo -e "${COLOR_BLUE}Updating projects local.properties${COLOR_END}"
+    android update project -p ./
+fi
+
 echo
 echo -e "${COLOR_BLUE}Packaging${COLOR_END}"
 ant debug
 
 echo
+echo -e "${COLOR_BLUE}Uninstalling org.realxtend.tundra from active device/emulator${COLOR_END}"
+adb uninstall org.realxtend.tundra # Explicit uninstall as 'adb install -r' won't update the assets?
+
+echo
 echo -e "${COLOR_BLUE}Installing to active device/emulator via adb${COLOR_END}"
-adb install -r bin/Tundra-debug.apk
+adb install bin/Tundra-debug.apk
 
 # Restore old path
 export PATH=${PATH_OLD}

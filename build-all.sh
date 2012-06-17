@@ -20,7 +20,13 @@ Options:
 
   -h, --help           Print this help
 
-Note: Params cannot be combined (eg. -odh).
+  Note: Params cannot be combined (eg. -odhsa).
+  
+Environment variables:
+  ANDROID_NDK_ROOT     Read as --ndk if the option is not passed
+  ANDROID_SDK_ROOT     Read as --sdk if the option is not passed
+
+  These are optional. Saves you typing of --sdk and --ndk for every run.
 
 EOF
 }
@@ -92,9 +98,17 @@ while [[ $1 = -* ]]; do
     esac
 done
 
+if [ "${INPUT_NDK}" == "" ] && [ "${ANDROID_NDK_ROOT}" != "" ] ; then
+    INPUT_NDK=${ANDROID_NDK_ROOT}
+    echo "* Using NDK from env variable ANDROID_NDK_ROOT"
+fi
 if [ "${INPUT_NDK}" == "" ] || [ ! -e ${INPUT_NDK}/build/tools/make-standalone-toolchain.sh ] ; then
     echo -e "${COLOR_RED}Error: --ndk not passed or invalid. See $0 --help${COLOR_END}"
 	exit 1
+fi
+if [ "${INPUT_SDK}" == "" ] && [ "${ANDROID_SDK_ROOT}" != "" ] ; then
+    INPUT_SDK=${ANDROID_SDK_ROOT}
+    echo "* Using SDK from env variable ANDROID_SDK_ROOT"
 fi
 if [ "${INPUT_SDK}" == "" ] || [ ! -e ${INPUT_SDK}/tools/android ] ; then
     echo -e "${COLOR_RED}Error: --sdk not passed or invalid. See $0 --help${COLOR_END}"
