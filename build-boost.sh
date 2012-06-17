@@ -44,7 +44,7 @@ else
     echo "-- ${BOOST_SOURCE_NAME}.tar.gz already downloaded and extracted, skipping."
 fi
 
-pushd "${BOOST_SOURCE_NAME}"
+pushd "${BOOST_SOURCE_NAME}" >> /dev/null
 
 # Make the initial bootstrap
 if [ ! -f ./b2 ] ; then
@@ -160,6 +160,6 @@ else
     echo "-- Already built, remove ${DETECTION_LIB} to trigger a rebuild."
 fi
 
-popd
+popd >> /dev/null
 echo
 

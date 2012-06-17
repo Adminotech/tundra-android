@@ -41,7 +41,7 @@ if [ ! -f ${DETECTION_LIB} ] ; then
     cp -u ${PREBUILT}/lib/* ${PREFIX}/lib/
     cp -u -r ${PREBUILT}/include/* ${PREFIX}/include/
 
-    popd
+    popd >> /dev/null
 else
     echo "-- Already built, remove ${DETECTION_LIB} to trigger a rebuild."
 fi

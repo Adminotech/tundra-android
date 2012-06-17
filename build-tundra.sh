@@ -18,7 +18,7 @@ else
     echo -e "${COLOR_BLUE}-- Repository already cloned, skipping.${COLOR_END}"
 fi
 
-pushd "${TUNDRA_SOURCE_DIR}"
+pushd "${TUNDRA_SOURCE_DIR}" >> /dev/null
 
 export TUNDRA_INSTALL_PATH=$(pwd)/android-install
 export TUNDRA_DEP_PATH=${PREFIX}
@@ -67,6 +67,6 @@ else
     echo -e "${COLOR_BLUE}-- 'make install' already done, remove ${TUNDRA_INSTALL_PATH} to reinstall.${COLOR_END}"
 fi
 
-popd
+popd >> /dev/null
 echo
 

@@ -29,7 +29,7 @@ else
     echo "-- Repository already cloned, skipping."
 fi
 
-pushd "${QT_SOURCE_DIR}"
+pushd "${QT_SOURCE_DIR}" >> /dev/null
 
 QT_CONF_ARG="0"
 if [ ! -f android/tundra.qt.configured ] ; then
@@ -58,6 +58,6 @@ else
     echo "   cd src/qt && git clean -fdx && git checkout ./ && rm ${DETECTION_LIB}"
 fi
 
-popd
+popd >> /dev/null
 echo
 

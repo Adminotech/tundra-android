@@ -64,7 +64,7 @@ if [ ! -f ${DETECTION_LIB} ] ; then
     make CC="${CC}" AR="${AR}" RANLIB="${RANLIB}" CFLAGS="${CFLAGS}"
     make install PREFIX=${PREFIX}  # Ignore errors due to share libraries missing
 
-    popd
+    popd >> /dev/null
 else
     echo "-- Already built, remove ${DETECTION_LIB} to trigger a rebuild."
 fi

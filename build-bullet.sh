@@ -21,7 +21,7 @@ if [ ! -f ${DETECTION_LIB} ] ; then
     make -j4
     make install
 
-    popd
+    popd >> /dev/null
 else
     echo "-- Already built, remove ${DETECTION_LIB} to trigger a rebuild."
 fi

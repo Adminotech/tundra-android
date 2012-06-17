@@ -3,7 +3,7 @@ echo -e "${COLOR_GREEN}Building and packaging tundra for android${COLOR_END}"
 
 TUNDRA_ANDROID_SOURCE_DIR=build-android
 
-pushd "${TUNDRA_ANDROID_SOURCE_DIR}"
+pushd "${TUNDRA_ANDROID_SOURCE_DIR}" >> /dev/null
 
 # Set clean path for only NDK/SDK
 PATH_OLD=$PATH
@@ -29,6 +29,6 @@ adb install -r bin/Tundra-debug.apk
 # Restore old path
 export PATH=${PATH_OLD}
 
-popd
+popd >> /dev/null
 echo
 

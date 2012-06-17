@@ -28,7 +28,7 @@ if [ ! -f ${DETECTION_LIB} ] ; then
     cp -u lib/libkNet.a ${PREFIX}/lib/
     cp -u -r include/* ${PREFIX}/include/
     
-    popd
+    popd >> /dev/null
 else
     echo "-- Already built, remove ${DETECTION_LIB} to trigger a rebuild."
 fi

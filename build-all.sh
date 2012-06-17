@@ -170,8 +170,7 @@ echo "-- Install prefix  = ${PREFIX}"
 echo "-- CMake toolchain = $PREFAB/android.toolchain.cmake"
 echo
 
-pushd $SRCDIR
-echo
+pushd $SRCDIR >> /dev/null
 
 if [ "${INPUT_SKIP_DEPS}" == "FALSE" ] ; then
     ${TOPDIR}/build-bzip2.sh
@@ -190,8 +189,7 @@ else
     echo -e "${COLOR_BLUE}Skipping Tundra build by request${COLOR_END}"
 fi
 
-popd
-echo
+popd >> /dev/null
 
 if [ "${INPUT_SKIP_ANDROID}" == "FALSE" ] ; then
     ${TOPDIR}/build-tundra-android.sh
